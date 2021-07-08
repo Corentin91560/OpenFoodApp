@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/main_menu_social"
+        android:icon="@drawable/sociaux"
+        android:title="Social" />
+    <item
+        android:id="@+id/main_menu_leaderboard"
+        android:icon="@drawable/podium_1_"
+        android:title="Board" />
+    <item
+        android:id="@+id/main_menu_scan"
+        android:icon="@drawable/camera"
+        android:title="Scan" />
+    <item
+        android:id="@+id/main_menu_achievement"
+        android:icon="@drawable/trophee"
+        android:title="Achievement" />
+    <item
+        android:id="@+id/main_menu_profile"
+        android:icon="@drawable/profile"
+        android:title="Profile" />
+
+</menu>
