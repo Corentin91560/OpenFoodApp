@@ -1,60 +1,112 @@
 package com.example.openfoodapp.fragment
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.openfoodapp.R
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import android.graphics.BitmapFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import android.net.Uri
+import android.widget.*
+import com.example.openfoodapp.utils.FireBase
+import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.net.URL
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    lateinit var imageProfile : ImageView
+    private var pictureUrl: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        val view :View = inflater.inflate(R.layout.fragment_profile, container, false)
+
+
+        val etName = view.findViewById<EditText>(R.id.et_name_profile)
+        etName.setText(Firebase.auth.currentUser?.displayName)
+        val etEmail = view.findViewById<EditText>(R.id.et_email_profile)
+        etEmail.setText(Firebase.auth.currentUser?.email)
+        val etPassword = view.findViewById<EditText>(R.id.et_password_profile)
+        val tvExperience = view.findViewById<TextView>(R.id.tv_experience_profile)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar_profile)
+        GlobalScope.launch(Dispatchers.Main) {
+            val experience = Firebase.auth.currentUser?.let { it1 -> FireBase().getUserExperience(it1.uid) }
+            tvExperience.text = "Experience : ${experience.toString()} XP"
+        }
+
+        val imageProfile = view.findViewById<ImageView>(R.id.imageView_profile)
+        Log.d("TAG", "onCreateView: ${Firebase.auth.currentUser?.photoUrl.toString()}")
+        val url = URL("${Firebase.auth.currentUser?.photoUrl.toString()}?alt=media")
+        val bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+        imageProfile.setImageBitmap(bmp)
+
+        val uploadButton = view.findViewById<Button>(R.id.upload_picture_button_profile)
+        uploadButton.setOnClickListener {
+            openGalleryForImage()
+        }
+        val applyChangeButton = view.findViewById<Button>(R.id.apply_change_button_profile)
+        applyChangeButton.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+            if (etEmail.text.toString() != ""|| etPassword.text.toString() != ""||etName.text.toString() != ""){
+                GlobalScope.launch(Dispatchers.Main) {
+                    pictureUrl?.let { pictureUri ->
+                        Firebase.auth.currentUser?.uid?.let { uid ->
+                            val pictureforFirebase = FireBase().addUserInfo(
+                                uid,
+                                pictureUri,
+                                etName.text.toString()
+                            )
+                            val profileUpdates =
+                                UserProfileChangeRequest.Builder()
+                                    .setDisplayName(etName.text.toString())
+                                    .setPhotoUri(pictureforFirebase)
+                                    .build()
+                            Firebase.auth.currentUser?.updateProfile(profileUpdates)
+                            Firebase.auth.currentUser?.updateEmail(etEmail.text.toString())
+                            Firebase.auth.currentUser?.updatePassword(etPassword.text.toString())
+                        }
+                    }
+                    progressBar.visibility = View.INVISIBLE
+                }
+            }else{
+                Toast.makeText(activity,"Complete every field",Toast.LENGTH_LONG).show()
+                progressBar.visibility = View.INVISIBLE
+            }
+
+        }
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == 100 && null != data){
+            pictureUrl = data.data
+            imageProfile.setImageURI(pictureUrl)
+        }
     }
+
+    private fun openGalleryForImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, 100)
+    }
+
 }

@@ -2,4 +2,9 @@
     <string name="app_name">OpenFoodApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="first_txt">You are the new Scanner, and the world needs you. You will be able to search for new barcodes with the help of this application. Nothing could be easier! If you are here, it\'s because you are coming for the first time.</string>
+    <string name="second_txt">To complete your adventure, you will have to scan the barcode present on food products. But these products may contain errors, but thanks to your sharp vision you\'ll be able to detect them without worrying. Also you will have the possibility to add your picture of the product as a signature.</string>
+    <string name="third_txt">But you will never be alone in your adventure!By joining the Scanner community you will be able to measure yourself against certain criteria to push you to be the best Scanner</string>
+    <string name="fourth">And of course we will reward you as it should be by offering you distinctions thanks to the achievements you will make.</string>
+    <string name="five">Now it\'s your turn to start your adventure! Good luck and give the best of yourself to be the best Scanner</string>
 </resources>

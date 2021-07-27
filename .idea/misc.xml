@@ -3,17 +3,41 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../../layout/custom_preview.xml" value="0.20833333333333334" />
+        <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.2390625" />
+        <entry key="app/src/main/res/drawable/rounded_corner_leaderboard.xml" value="0.15098684210526317" />
+        <entry key="app/src/main/res/drawable/rounded_corner_leaderboard_bronze.xml" value="0.13355263157894737" />
+        <entry key="app/src/main/res/drawable/rounded_corner_leaderboard_gold.xml" value="0.13355263157894737" />
+        <entry key="app/src/main/res/drawable/rounded_corner_leaderboard_silver.xml" value="0.13355263157894737" />
+        <entry key="app/src/main/res/drawable/rounded_corner_right.xml" value="0.15098684210526317" />
+        <entry key="app/src/main/res/drawable/rounded_corner_without_border.xml" value="0.15098684210526317" />
+        <entry key="app/src/main/res/layout/achievement_list_item.xml" value="0.2890625" />
+        <entry key="app/src/main/res/layout/activity_edit_image.xml" value="0.11315789473684211" />
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.19270833333333334" />
+        <entry key="app/src/main/res/layout/activity_result_barcode.xml" value="0.12203947368421053" />
+        <entry key="app/src/main/res/layout/activity_tutorial.xml" value="0.16" />
         <entry key="app/src/main/res/layout/fragment_achievement.xml" value="0.19791666666666666" />
-        <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.21197916666666666" />
+        <entry key="app/src/main/res/layout/fragment_edit_image.xml" value="0.12203947368421053" />
+        <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/fragment_leaderboard_detail.xml" value="0.2170212765957447" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.21197916666666666" />
-        <entry key="app/src/main/res/layout/fragment_result_barcode.xml" value="0.21197916666666666" />
+        <entry key="app/src/main/res/layout/fragment_result_barcode.xml" value="0.18" />
         <entry key="app/src/main/res/layout/fragment_scan.xml" value="0.21197916666666666" />
         <entry key="app/src/main/res/layout/fragment_social.xml" value="0.19791666666666666" />
+        <entry key="app/src/main/res/layout/layout_submenu_leaderboard.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/leaderboard_list_item.xml" value="0.28269484808454426" />
+        <entry key="app/src/main/res/layout/rounded_corner.xml" value="0.19270833333333334" />
         <entry key="app/src/main/res/layout/signin_layout.xml" value="0.37604166666666666" />
+        <entry key="app/src/main/res/layout/signup_layout.xml" value="0.23020833333333332" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.21197916666666666" />
       </map>
     </option>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="com.squareup.moshi.JsonClass" />
+    </list>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

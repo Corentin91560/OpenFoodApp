@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background"
+    >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ProgressBar
+                android:id="@+id/progress_bar_leaderboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/progressBarStyleLarge"
+                android:visibility="invisible"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:elevation="1dp"
+                />
+
+            <TextView
+                android:id="@+id/title_leaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Leaderboard"
+                app:layout_constraintTop_toTopOf="parent"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:background="@color/purple_700"
+                />
+
+            <ListView
+                android:id="@+id/listview_leaderboard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="48dp"
+                android:layout_marginBottom="110dp"
+                />
+
+            <RelativeLayout
+                android:id="@+id/current_user_ranking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:padding="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/rounded_corner_leaderboard"
+                android:backgroundTint="@color/navbar"
+                android:layout_marginVertical="15dp"
+                >
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <TextView
+                        android:id="@+id/rank_current_user"
+                        android:layout_width="wrap_content"
+                        android:layout_height="64dp"
+                        android:gravity="center"
+                        android:paddingRight="20dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
+
+                    <TextView
+                        android:id="@+id/rank_current_user_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toRightOf="@id/rank_current_user"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
+
+                    <TextView
+                        android:id="@+id/rank_current_user_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_below="@id/rank_current_user_username"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toRightOf="@id/rank_current_user"
+                        app:layout_constraintTop_toBottomOf="@id/rank_current_user_username"
+                        />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/layout_submenu_leaderboard"/>
+
+</FrameLayout>

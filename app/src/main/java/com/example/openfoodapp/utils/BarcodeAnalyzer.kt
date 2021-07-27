@@ -2,7 +2,6 @@ package com.example.openfoodapp.utils
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.openfoodapp.fragment.BarcodeListener
@@ -15,7 +14,6 @@ class BarcodeAnalyzer(private val barcodeListener: BarcodeListener) : ImageAnaly
 
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
-        try {
             val mediaImage = imageProxy.image
             if (mediaImage != null) {
                 val image =
@@ -25,19 +23,17 @@ class BarcodeAnalyzer(private val barcodeListener: BarcodeListener) : ImageAnaly
                     .addOnSuccessListener { barcodes ->
                         // Task completed successfully
                         for (barcode in barcodes) {
+                            Log.d("TAG", "analyze: ${barcode.rawValue}")
                             barcodeListener(barcode.rawValue ?: "")
                         }
                     }
                     .addOnFailureListener {
-                        // You should really do something about Exceptions
+                        Log.e("TAG", "analyze: ${it.stackTrace}", )
                     }
                     .addOnCompleteListener {
                         // It's important to close the imageProxy
                         imageProxy.close()
                     }
             }
-        }catch (error: NullPointerException){
-            Log.e("TAG", "analyze: ${error.stackTrace}", )
-        }
     }
 }

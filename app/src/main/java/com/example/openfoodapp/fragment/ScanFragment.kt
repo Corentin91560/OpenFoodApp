@@ -14,37 +14,30 @@ import androidx.core.content.ContextCompat
 import com.example.openfoodapp.R
 import kotlinx.android.synthetic.main.fragment_scan.*
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.atomic.AtomicBoolean
 import android.Manifest.permission.CAMERA
+import android.app.AlertDialog
+import android.text.InputType
+import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavDirections
+import com.example.openfoodapp.models.Product
 import com.example.openfoodapp.utils.BarcodeAnalyzer
-import kotlinx.coroutines.delay
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.*
+import java.io.IOException
 import java.util.concurrent.Executors
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ScanFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 
 typealias BarcodeListener = (barcode: String) -> Unit
 
 class ScanFragment : Fragment() {
 
     private lateinit var cameraExecutor: ExecutorService
-
-    val navigation: LiveData<NavDirections?> get() = _navigation
-    private val _navigation = MutableLiveData<NavDirections?>()
+    private val resultBarcodeFragment = ResultBarcodeFragment()
+    private var processing : Boolean = false
+    lateinit var progressBar : ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,84 +56,120 @@ class ScanFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_scan, container, false)
+        val view = inflater.inflate(R.layout.fragment_scan, container, false)
+
+        progressBar = view.findViewById(R.id.progress_bar_scan)
+
+        val floating : FloatingActionButton = view.findViewById(R.id.floating_button_manual_scan)
+        floating.setOnClickListener {
+            showdialog()
+        }
+
+        return view
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ScanFragment.
-         */
+
         private val REQUIRED_PERMISSIONS = arrayOf(CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ScanFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+
     }
 
     private fun startCamera() {
-        // Create an instance of the ProcessCameraProvider,
-        // which will be used to bind the use cases to a lifecycle owner.
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        val resultBarcodeFragment = ResultBarcodeFragment()
 
-        // Add a listener to the cameraProviderFuture.
-        // The first argument is a Runnable, which will be where the magic actually happens.
-        // The second argument (way down below) is an Executor that runs on the main thread.
-        cameraProviderFuture.addListener({
-            // Add a ProcessCameraProvider, which binds the lifecycle of your camera to
-            // the LifecycleOwner within the application's life.
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            // Initialize the Preview object, get a surface provider from your PreviewView,
-            // and set it on the preview instance.
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(
-                    fragment_scan_preview_view.surfaceProvider
-                )
-            }
-            val imageAnalysis = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, BarcodeAnalyzer { barcode ->
-                        Log.e("TAG", "onCreate: $barcode", )
-                        val bundle = Bundle()
-                        bundle.putString("barcode",barcode)
-                        resultBarcodeFragment.arguments = bundle
-                        fragmentManager!!.beginTransaction()
-                            .replace(R.id.home_frame_layout,resultBarcodeFragment)
-                            .commit()
-
-                    })
+            cameraProviderFuture.addListener({
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                val preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(
+                        fragment_scan_preview_view.surfaceProvider
+                    )
                 }
 
-            // Select back camera
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            try {
-                // Unbind any bound use cases before rebinding
-                cameraProvider.unbindAll()
-                // Bind use cases to lifecycleOwner
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
-            } catch (e: Exception) {
-                Log.e("PreviewUseCase", "Binding failed! :(", e)
-            }
-        }, ContextCompat.getMainExecutor(requireContext()))
+                val imageAnalysis = ImageAnalysis.Builder()
+                    .build()
+                    .also {
+                        it.setAnalyzer(cameraExecutor, BarcodeAnalyzer { barcode ->
+                            startProcessBarcode(barcode)
+                        })
+                    }
+
+                // Select back camera
+                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                try {
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+                } catch (e: Exception) {
+                    Log.e("PreviewUseCase", "Binding failed! :(", e)
+                }
+            }, ContextCompat.getMainExecutor(requireContext()))
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             requireContext(), it
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun showdialog(){
+
+        val builder: AlertDialog.Builder = AlertDialog.Builder(activity!!)
+        builder.setTitle("Enter Barcode")
+
+        val input = EditText(activity)
+        input.hint = "Enter ScanCode"
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+
+        builder.setPositiveButton("OK") { _, _ ->
+            startProcessBarcode(input.text.toString())
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    private fun startProcessBarcode(barcode : String){
+        val client = OkHttpClient()
+        val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+        val productJsonAdapter = moshi.adapter<Product>(Product::class.java)
+
+        val request = Request.Builder()
+            .url("https://api.formation-android.fr/getProduct?barcode=$barcode")
+            .build()
+        if (!processing) {
+            progressBar.visibility = View.VISIBLE
+            processing = true
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    progressBar.visibility = View.INVISIBLE
+                    processing = false
+                    Toast.makeText(activity,"something went wrong, try again later !",Toast.LENGTH_LONG).show()
+                    Log.e("TAG", e.printStackTrace().toString())
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    processing = false
+                    response.use {
+
+                        val product = productJsonAdapter.fromJson(response.body!!.source())
+
+                        if (product != null) {
+                            progressBar.visibility = View.INVISIBLE
+                            val bundle = Bundle()
+                            bundle.putSerializable("product", product)
+                            resultBarcodeFragment.arguments = bundle
+                            fragmentManager?.beginTransaction()
+                                ?.replace(R.id.home_frame_layout, resultBarcodeFragment)
+                                ?.commit()
+                        }
+                    }
+                }
+            })
+        }
     }
 
 }

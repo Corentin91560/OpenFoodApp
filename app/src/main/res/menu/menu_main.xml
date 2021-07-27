@@ -2,10 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/main_menu_social"
-        android:icon="@drawable/sociaux"
-        android:title="Social" />
-    <item
         android:id="@+id/main_menu_leaderboard"
         android:icon="@drawable/podium_1_"
         android:title="Board" />
